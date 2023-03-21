@@ -1,0 +1,10 @@
+#carouselApi {
+    max-width: 50%;
+    margin: auto;
+}
+
+#cardHolder {
+    display: grid;
+    grid-row: 2;
+    grid-template-columns: auto;
+}
