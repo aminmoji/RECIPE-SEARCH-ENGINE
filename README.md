@@ -19,8 +19,7 @@ CSS
 JavaScript
 jQuery
 Edamam API
-Contributing
-If you would like to contribute to the Recipe Search Engine, please fork the repository and submit a pull request.
+
 
 License
 The Recipe Search Engine is licensed under the MIT License.
