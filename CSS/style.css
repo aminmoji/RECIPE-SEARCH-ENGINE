@@ -4,16 +4,26 @@
     grid-template-columns: auto;
 }
 
-.carousel-inner{
-    width:100%;
-    max-height: 400px !important;
-  }
+#carouselContainer, .carousel-inner {
+    height: 50% !important;
+}
 
-.carousel-caption d-none d-md-block {
+#carousel-text {
     font-family: 'Gloria Hallelujah', cursive;
-    text-align: center;
-    left: auto;
-    right: auto;
-    top: auto;
-    bottom: auto;
+    background-color: transparent, gray;
+    font-size: 40px;
+    background-color: rgba(128, 128, 128, 0.5);
+}
+
+.card-body {
+    font-size: 15px;
+    font-weight: bold;
+}
+
+#main {
+    display: flex;
+    justify-content: center;
+    align-content: center;
+    margin-left: auto;
+    margin-right: auto;
 }
