@@ -373,7 +373,7 @@ function criteriaHandler() {
       ? $("#input").attr("placeholder", "in Calories")
       : $("#input").attr("placeholder", "Search Here");
 }
-
+//Attempt at saving modal ids to localStorage
 function storeModalId() {
   console.log("yes!");
   let modalId = $(this).attr("id");
@@ -385,6 +385,7 @@ function storeModalId() {
   }
 }
 
+//Scrolls down to search results
 function scrollDown(id) {
   id = "main";
   $("html,body").animate(
