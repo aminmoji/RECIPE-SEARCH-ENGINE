@@ -3,8 +3,10 @@ let $recipeValue;
 let $nutriValue;
 let cardRecipes = [];
 let modalRecipes;
+let modalCarsRecipes;
 let isLoading = false;
 let modalIds = [];
+let carouselIds = [];
 
 // The carousel loads here
 $(document).ready(function () {
@@ -24,7 +26,7 @@ $(document).ready(function () {
     // });
     $.each(data.recipes, function (i, recipe) {
       // console.log(recipe);
-
+      carouselIds.push(recipe.id);
       $('div[class="carousel-indicators"]').append(
         `<button type="button" data-bs-target="#carouselApi" data-bs-slide-to="${i}" class="${
           i === 0 ? "active" : ""
@@ -35,18 +37,29 @@ $(document).ready(function () {
 
       $('div[class="carousel-inner"]').append(
         `<div class="carousel-item p-1 ${i === 0 ? "active" : ""}">
-        <img src="${recipe.image}" class="d-block w-100" alt="">
+        <a href="#${recipe.id}" data-bs-toggle="modal" data-bs-target="#${
+          recipe.id
+        }">
+          <img src="${recipe.image}" class="d-block w-100" alt="">
+        </a>
         <div class="carousel-caption d-none d-md-block">
-                    <p>${recipe.title}</p>
+                    <a href="#${
+                      recipe.id
+                    }" data-bs-toggle="modal" data-bs-target="#${
+          recipe.id
+        }"><p>${recipe.title}</p></a>
                   </div>
                 </div>`
       );
       // $('img[class="d-block w-100"]').attr("src", recipe.image);
       // $('a[class="caption"]').text(recipe.title);
+      console.log(carouselIds);
     });
+    addCarsModals();
   });
 });
 
+$("");
 $("#search-btn").on("click", eventHandler);
 $("#criterium li a").on("click", criteriaHandler);
 // $('button[class="btn btn-primary"]').on("click", addModalRecipe);
@@ -59,6 +72,7 @@ function eventHandler(e) {
   if ($('button[id="criteria"]').text() === "Ingredients") {
     e.preventDefault();
     $ingredients = $("#input").val();
+    console.log($ingredients);
     displayLoading(true);
     $.ajax({
       async: true,
@@ -170,7 +184,7 @@ function displayLoading(isLoading) {
   }
 }
 
-//Function for when searching by Ingredients to populate the cards
+//Function to populate the cards
 function addCards() {
   //Clears the precious cards when a new search parameter is inserted
   $("#main").empty();
@@ -184,33 +198,14 @@ function addCards() {
                               ${cardRecipe.title}
                               </div>
                               <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#${cardRecipe.id}">
-                                Vew Recipe
+                                View Recipe
                               </button>
                             </div>
-                          </div>`);
+                        </div>`);
   });
 }
 
-//Function for when searching Recipes to populate the cards
-// function addCardsRecps() {
-//   //Clears the precious cards when a new search parameter is inserted
-//   $("#main").empty();
-//   $.each(cardRecipes, function (_, cardRecipe) {
-//     //Appends Recipe Cards to main
-//     $("#main").append(`<div class="card text-center col p-1">
-//                             <img src="${cardRecipe.image}" class="card-img-top" alt="${cardRecipe.title}" />
-//                             <div class="card-body">
-//                               <div class="card-title">
-//                               ${cardRecipe.title}
-//                               </div>
-//                               <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#${cardRecipe.id}">
-//                                 Vew Recipe
-//                               </button>
-//                             </div>
-//                           </div>`);
-//   });
-// }
-
+//This function requests data from API using IDs stored in modalIds
 function getModalInfo() {
   return new Promise((resolve, reject) => {
     let modalIdsStr = modalIds.join(",");
@@ -242,11 +237,10 @@ function getModalInfo() {
   });
 }
 
+//This adds Modals with data fetched from API
 function addModals() {
   getModalInfo().then(() => {
-    console.log("here we go");
     $.each(modalRecipes, function (_, modalRecipe) {
-      console.log(modalRecipe.id);
       $("#main").append(`<!-- The Modal -->
                         <div class="modal shadow-lg" id="${modalRecipe.id}">
                           <div class="modal-dialog">
@@ -254,7 +248,6 @@ function addModals() {
 
                               <!-- Modal Header -->
                               <div class="modal-header">
-                                <img src="${modalRecipe.image}" alt="${modalRecipe.title}" />
                                 <h4 class="modal-title">${modalRecipe.title}</h4>
                                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                               </div>
@@ -277,8 +270,82 @@ function addModals() {
   });
 }
 
-//Changes the value of button in search bar on selection
+//This function requests carousel items info from API
+function getModalCarsInfo() {
+  return new Promise((resolve, reject) => {
+    let carouselIdsStr = carouselIds.join(",");
+    console.log(carouselIdsStr);
+    $.ajax({
+      async: false,
+      crossDomain: true,
+      url: `https://spoonacular-recipe-food-nutrition-v1.p.rapidapi.com/recipes/informationBulk?ids=${carouselIdsStr}`,
+      method: "GET",
+      headers: {
+        "X-RapidAPI-Key": "57efcb2c17msh4a98997aba86fecp185c0ejsn271ea46ec6ee",
+        "X-RapidAPI-Host":
+          "spoonacular-recipe-food-nutrition-v1.p.rapidapi.com",
+      },
+    })
+      .then((data) => {
+        if (!data.length) {
+          // show no result message and return
+        }
+        modalCarsRecipes = data;
+        console.log(modalCarsRecipes);
+        resolve();
+      })
+      .catch((e) => {
+        console.log(e);
+        reject();
+      })
+      .then(() => displayLoading(false));
+  });
+}
+
+//This function creates modals for carousel recipes
+function addCarsModals() {
+  getModalCarsInfo().then(() => {
+    $.each(modalCarsRecipes, function (_, modalCarsRecipe) {
+      $("#main").append(`<!-- The Modal -->
+                        <div class="modal shadow-lg" id="${modalCarsRecipe.id}">
+                          <div class="modal-dialog">
+                            <div class="modal-content">
+
+                              <!-- Modal Header -->
+                              <div class="modal-header">
+                                <h4 class="modal-title">${modalCarsRecipe.title}</h4>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                              </div>
+
+                              <!-- Modal body -->
+                              <div class="modal-body"">
+                                <p>${modalCarsRecipe.instructions}</p>
+
+                              </div>
+
+                              <!-- Modal footer -->
+                              <div class="modal-footer">
+                                <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Close</button>
+                              </div>
+
+                            </div>
+                          </div>
+                        </div>`);
+    });
+  });
+}
+
+//Changes the values of button and input placeholder on selection
 function criteriaHandler() {
-  let text = $(this).text();
+  $("#input").val("");
+  const text = $(this).text();
   $('button[id="criteria"]').text(text);
+  const placeHolder =
+    text === "Recipe"
+      ? $("#input").attr("placeholder", "Name of your recipe")
+      : text === "Ingredients"
+      ? $("#input").attr("placeholder", "Separate by Comma")
+      : text === "Nutritional Value"
+      ? $("#input").attr("placeholder", "in Calories")
+      : $("#input").attr("placeholder", "Search Here");
 }
