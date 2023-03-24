@@ -63,7 +63,7 @@ $(document).ready(function () {
 $("#search-btn").on("click", eventHandler);
 //Calls criteriaHandler function when search criteria is selected
 $("#criterion li a").on("click", criteriaHandler);
-
+//Detects closing of modals and calls storeModalId function to collect modal id
 $(document).on("hidden.bs.modal", storeModalId);
 
 //This functions handles the API query based on search criteria
