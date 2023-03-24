@@ -20,6 +20,7 @@ HTML
 CSS
 JavaScript
 jQuery
+Google Fonts
 Recipe - Food - Nutrition API
 
 **Screenshots**
