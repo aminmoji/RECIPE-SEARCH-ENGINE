@@ -1,9 +1,12 @@
 let $ingredients;
+let $recipeValue;
+let $nutriValue;
 let cardRecipes = [];
 let modalRecipes;
+let isLoading = false;
+let modalIds = [];
 
-// let isLoading = false;
-
+// The carousel loads here
 $(document).ready(function () {
   $.ajax({
     async: true,
@@ -20,7 +23,7 @@ $(document).ready(function () {
     //   $('a[class="caption"]').text(d.title);
     // });
     $.each(data.recipes, function (i, recipe) {
-      console.log(recipe);
+      // console.log(recipe);
 
       $('div[class="carousel-indicators"]').append(
         `<button type="button" data-bs-target="#carouselApi" data-bs-slide-to="${i}" class="${
@@ -44,39 +47,122 @@ $(document).ready(function () {
   });
 });
 
-$("#search-btn").on("click", eventHandlerNutri);
+$("#search-btn").on("click", eventHandler);
 $("#criterium li a").on("click", criteriaHandler);
+// $('button[class="btn btn-primary"]').on("click", addModalRecipe);
+// $(".btn btn-primary").on("click", addModalRecipe);
 
-function eventHandlerNutri(e) {
-  e.preventDefault();
-  $ingredients = $("#input").val();
-  displayLoading(true);
-  $.ajax({
-    async: true,
-    crossDomain: true,
-    url: `https://spoonacular-recipe-food-nutrition-v1.p.rapidapi.com/recipes/findByIngredients?ingredients=${$ingredients}&number=5&ignorePantry=true&ranking=1`,
-
-    method: "GET",
-    headers: {
-      "X-RapidAPI-Key": "57efcb2c17msh4a98997aba86fecp185c0ejsn271ea46ec6ee",
-      "X-RapidAPI-Host": "spoonacular-recipe-food-nutrition-v1.p.rapidapi.com",
-    },
-  })
-    .then((data) => {
-      if (!data.length) {
-        // show no result message and return
-      }
-      cardRecipes = data;
-      console.log(data);
-      addCards();
+//Search Function//
+function eventHandler(e) {
+  console.log($('button[id="criteria"]').text());
+  //Function if search is based on Ingredients
+  if ($('button[id="criteria"]').text() === "Ingredients") {
+    e.preventDefault();
+    $ingredients = $("#input").val();
+    displayLoading(true);
+    $.ajax({
+      async: true,
+      crossDomain: true,
+      url: `https://spoonacular-recipe-food-nutrition-v1.p.rapidapi.com/recipes/findByIngredients?ingredients=${$ingredients}&number=10&ignorePantry=true&ranking=1`,
+      method: "GET",
+      headers: {
+        "X-RapidAPI-Key": "57efcb2c17msh4a98997aba86fecp185c0ejsn271ea46ec6ee",
+        "X-RapidAPI-Host":
+          "spoonacular-recipe-food-nutrition-v1.p.rapidapi.com",
+      },
     })
-    .catch((e) => console.log(e))
-    .then(() => displayLoading(false));
+      .then((data) => {
+        if (!data.length) {
+          // show no result message and return
+        }
+        cardRecipes = data;
+        console.log(cardRecipes);
+        $.each(cardRecipes, function (_, cardRecipe) {
+          modalIds.push(cardRecipe.id);
+        });
+        console.log(modalIds);
+        addCards();
+        // getModalInfo();
+        addModals();
+      })
+      .catch((e) => console.log(e))
+      .then(() => displayLoading(false));
+
+    //
+    //Function if search is based on Recipe
+  } else if ($('button[id="criteria"]').text() === "Recipe") {
+    e.preventDefault();
+    $recipeValue = $("#input").val();
+    displayLoading(true);
+    console.log($('button[id="criteria"]').text());
+    $.ajax({
+      async: true,
+      crossDomain: true,
+      url: `https://spoonacular-recipe-food-nutrition-v1.p.rapidapi.com/recipes/searchComplex?limitLicense=false&offset=0&number=10&minIron=0&minCalcium=0&maxVitaminB2=1000&maxMagnesium=1000&minPotassium=0&maxVitaminB6=1000&intolerances=peanut%2C%20shellfish&maxVitaminB5=1000&minFolicAcid=0&minVitaminA=0&maxSodium=1000&maxSugar=1000&maxVitaminA=5000&maxFluoride=1000&minFluoride=0&minVitaminB1=0&minCholine=0&ranking=2&minFat=5&maxVitaminB1=1000&minVitaminB12=0&maxSelenium=1000&minZinc=0&minFolate=0&maxManganese=1000&maxVitaminB12=1000&maxPotassium=1000&maxIron=1000&minSelenium=0&minVitaminK=0&maxFiber=1000&minSodium=0&maxCopper=1000&minCalories=150&maxCholine=1000&minCholesterol=0&maxVitaminE=1000&minProtein=5&minVitaminB3=0&minVitaminB6=0&maxIodine=1000&excludeIngredients=coconut%2C%20mango&maxProtein=100&minMagnesium=0&minCarbs=5&cuisine=american&maxCaffeine=1000&maxSaturatedFat=50&maxVitaminK=1000&minAlcohol=0&minIodine=0&query=${$recipeValue}&minSaturatedFat=0&includeIngredients=onions%2C%20lettuce%2C%20tomato&minVitaminE=0&maxCalcium=1000&minFiber=0&minVitaminC=0&maxZinc=1000&maxCalories=1500&maxAlcohol=1000&minPhosphorus=0&minVitaminD=0&minVitaminB2=0&minSugar=0&maxFolate=1000&type=main%20course&maxCholesterol=1000&maxVitaminB3=1000&minCaffeine=0&minVitaminB5=0&maxFolicAcid=1000&maxCarbs=100&maxVitaminD=1000&equipment=pan&maxFat=100&minCopper=0&maxVitaminC=1000&maxPhosphorus=1000&minManganese=0`,
+      method: "GET",
+      headers: {
+        "X-RapidAPI-Key": "57efcb2c17msh4a98997aba86fecp185c0ejsn271ea46ec6ee",
+        "X-RapidAPI-Host":
+          "spoonacular-recipe-food-nutrition-v1.p.rapidapi.com",
+      },
+    })
+      .then((data) => {
+        if (!data.length) {
+          // show no result message and return
+        }
+        cardRecipes = data.results;
+        console.log(cardRecipes);
+        $.each(cardRecipes, function (_, cardRecipe) {
+          modalIds.push(cardRecipe.id);
+        });
+        console.log(modalIds);
+        addCards();
+        // getModalInfo();
+        addModals();
+      })
+      .catch((e) => console.log(e))
+      .then(() => displayLoading(false));
+  } else if ($('button[id="criteria"]').text() === "Nutritional Value") {
+    e.preventDefault();
+    $nutriValue = $("#input").val();
+    displayLoading(true);
+    console.log($('button[id="criteria"]').text());
+    $.ajax({
+      async: true,
+      crossDomain: true,
+      url: `https://spoonacular-recipe-food-nutrition-v1.p.rapidapi.com/recipes/findByNutrients?limitLicense=false&minProtein=0&minVitaminC=0&minSelenium=0&maxFluoride=50&maxVitaminB5=50&maxVitaminB3=50&maxIodine=50&minCarbs=0&maxCalories=${$nutriValue}&minAlcohol=0&maxCopper=50&maxCholine=50&maxVitaminB6=50&minIron=0&maxManganese=50&minSodium=0&minSugar=0&maxFat=20&minCholine=0&maxVitaminC=50&maxVitaminB2=50&minVitaminB12=0&maxFolicAcid=50&minZinc=0&offset=0&maxProtein=100&minCalories=0&minCaffeine=0&minVitaminD=0&maxVitaminE=50&minVitaminB2=0&minFiber=0&minFolate=0&minManganese=0&maxPotassium=50&maxSugar=50&maxCaffeine=50&maxCholesterol=50&maxSaturatedFat=50&minVitaminB3=0&maxFiber=50&maxPhosphorus=50&minPotassium=0&maxSelenium=50&maxCarbs=100&minCalcium=0&minCholesterol=0&minFluoride=0&maxVitaminD=50&maxVitaminB12=50&minIodine=0&maxZinc=50&minSaturatedFat=0&minVitaminB1=0&maxFolate=50&minFolicAcid=0&maxMagnesium=50&minVitaminK=0&maxSodium=50&maxAlcohol=50&maxCalcium=50&maxVitaminA=50&maxVitaminK=50&minVitaminB5=0&maxIron=50&minCopper=0&maxVitaminB1=50&number=10&minVitaminA=0&minPhosphorus=0&minVitaminB6=0&minFat=5&minVitaminE=0`,
+      method: "GET",
+      headers: {
+        "X-RapidAPI-Key": "57efcb2c17msh4a98997aba86fecp185c0ejsn271ea46ec6ee",
+        "X-RapidAPI-Host":
+          "spoonacular-recipe-food-nutrition-v1.p.rapidapi.com",
+      },
+    })
+      .then((data) => {
+        if (!data.length) {
+          // show no result message and return
+        }
+        cardRecipes = data;
+        console.log(cardRecipes);
+        $.each(cardRecipes, function (_, cardRecipe) {
+          modalIds.push(cardRecipe.id);
+        });
+        console.log(modalIds);
+        addCards();
+        // getModalInfo();
+        addModals();
+      })
+      .catch((e) => console.log(e))
+      .then(() => displayLoading(false));
+  } else {
+    return;
+  }
 }
 
+//Display loading while awaiting the response
 function displayLoading(isLoading) {
   if (isLoading) {
-    $("#form").append(`<div id="loading">
+    $("#main").append(`<div id="loading" class="text-center">
                    Loading... 
                       </div>`);
   } else {
@@ -84,11 +170,13 @@ function displayLoading(isLoading) {
   }
 }
 
+//Function for when searching by Ingredients to populate the cards
 function addCards() {
-  // $('div[class="card"]').remove();
+  //Clears the precious cards when a new search parameter is inserted
   $("#main").empty();
-  // $(`#${cardRecipe}`).empty();
+  //Iterates the response
   $.each(cardRecipes, function (_, cardRecipe) {
+    //Appends the recipes in cards to main element
     $("#main").append(`<div class="card text-center col p-1">
                             <img src="${cardRecipe.image}" class="card-img-top" alt="${cardRecipe.title}" />
                             <div class="card-body">
@@ -96,45 +184,85 @@ function addCards() {
                               ${cardRecipe.title}
                               </div>
                               <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#${cardRecipe.id}">
-                                Open modal
+                                Vew Recipe
                               </button>
                             </div>
                           </div>`);
-    let recipeId = cardRecipe.id;
-    displayLoading(true);
+  });
+}
+
+//Function for when searching Recipes to populate the cards
+// function addCardsRecps() {
+//   //Clears the precious cards when a new search parameter is inserted
+//   $("#main").empty();
+//   $.each(cardRecipes, function (_, cardRecipe) {
+//     //Appends Recipe Cards to main
+//     $("#main").append(`<div class="card text-center col p-1">
+//                             <img src="${cardRecipe.image}" class="card-img-top" alt="${cardRecipe.title}" />
+//                             <div class="card-body">
+//                               <div class="card-title">
+//                               ${cardRecipe.title}
+//                               </div>
+//                               <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#${cardRecipe.id}">
+//                                 Vew Recipe
+//                               </button>
+//                             </div>
+//                           </div>`);
+//   });
+// }
+
+function getModalInfo() {
+  return new Promise((resolve, reject) => {
+    let modalIdsStr = modalIds.join(",");
+    console.log(modalIdsStr);
     $.ajax({
-      async: true,
+      async: false,
       crossDomain: true,
-      url: `https://spoonacular-recipe-food-nutrition-v1.p.rapidapi.com/recipes/${recipeId}/information`,
+      url: `https://spoonacular-recipe-food-nutrition-v1.p.rapidapi.com/recipes/informationBulk?ids=${modalIdsStr}`,
       method: "GET",
       headers: {
         "X-RapidAPI-Key": "57efcb2c17msh4a98997aba86fecp185c0ejsn271ea46ec6ee",
         "X-RapidAPI-Host":
           "spoonacular-recipe-food-nutrition-v1.p.rapidapi.com",
       },
-    }).then((data) => {
-      if (!data.length) {
-        // show no result message and return
-      }
-      modalRecipes = data;
-      console.log(modalRecipes);
-    });
+    })
+      .then((data) => {
+        if (!data.length) {
+          // show no result message and return
+        }
+        modalRecipes = data;
+        console.log(modalRecipes);
+        resolve();
+      })
+      .catch((e) => {
+        console.log(e);
+        reject();
+      })
+      .then(() => displayLoading(false));
+  });
+}
 
-    $("#main").append(`<!-- The Modal -->
-                        <div class="modal" id="${cardRecipe.id}">
+function addModals() {
+  getModalInfo().then(() => {
+    console.log("here we go");
+    $.each(modalRecipes, function (_, modalRecipe) {
+      console.log(modalRecipe.id);
+      $("#main").append(`<!-- The Modal -->
+                        <div class="modal shadow-lg" id="${modalRecipe.id}">
                           <div class="modal-dialog">
                             <div class="modal-content">
 
                               <!-- Modal Header -->
                               <div class="modal-header">
-                                <h4 class="modal-title">${modalRecipes.title}</h4>
+                                <img src="${modalRecipe.image}" alt="${modalRecipe.title}" />
+                                <h4 class="modal-title">${modalRecipe.title}</h4>
                                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                               </div>
 
                               <!-- Modal body -->
-                              <div class="modal-body">
-                              <p>${modalRecipes.extendedIngredients.original}</p>
-                              <p>${modalRecipes.analyzedInstructions.steps}</p>
+                              <div class="modal-body"">
+                                <p>${modalRecipe.instructions}</p>
+
                               </div>
 
                               <!-- Modal footer -->
@@ -145,9 +273,11 @@ function addCards() {
                             </div>
                           </div>
                         </div>`);
+    });
   });
 }
 
+//Changes the value of button in search bar on selection
 function criteriaHandler() {
   let text = $(this).text();
   $('button[id="criteria"]').text(text);

@@ -1,18 +1,13 @@
-#cardHolder {
-    display: grid;
-    grid-row: 2;
-    grid-template-columns: auto;
-}
-
-#carouselContainer, .carousel-inner {
-    height: 50% !important;
-}
-
-#carousel-text {
+.carousel-caption {
     font-family: 'Gloria Hallelujah', cursive;
     background-color: transparent, gray;
     font-size: 40px;
     background-color: rgba(128, 128, 128, 0.5);
+}
+
+
+.d-block w-100 {
+    max-height: 240px;
 }
 
 .card-body {
@@ -21,9 +16,13 @@
 }
 
 #main {
-    display: flex;
+    display: flexbox;
     justify-content: center;
     align-content: center;
     margin-left: auto;
     margin-right: auto;
+}
+
+.card {
+    max-width: 300px;
 }
