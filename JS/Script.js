@@ -66,6 +66,19 @@ $("#criterion li a").on("click", criteriaHandler);
 //Detects closing of modals and calls storeModalId function to collect modal id
 $(document).on("hidden.bs.modal", storeModalId);
 
+$(document).ready(function () {
+  $("#result-no").keyup(function (e) {
+    if (e.keyCode === 13) {
+      $("#search-btn").click();
+    }
+  });
+  $("#input").keyup(function (e) {
+    if (e.keyCode === 13) {
+      $("#search-btn").click();
+    }
+  });
+});
+
 //This functions handles the API query based on search criteria
 function eventHandler(e) {
   $resultsNo = $("#result-no").val();
@@ -102,6 +115,7 @@ function eventHandler(e) {
           modalIds.push(cardRecipe.id);
         });
         console.log(modalIds);
+        scrollDown();
         addCards();
         // getModalInfo();
         addModals();
@@ -137,6 +151,7 @@ function eventHandler(e) {
           modalIds.push(cardRecipe.id);
         });
         console.log(modalIds);
+        scrollDown();
         addCards();
         // getModalInfo();
         addModals();
@@ -170,6 +185,7 @@ function eventHandler(e) {
           modalIds.push(cardRecipe.id);
         });
         console.log(modalIds);
+        scrollDown();
         addCards();
         // getModalInfo();
         addModals();
@@ -367,4 +383,14 @@ function storeModalId() {
     visitedIds.push(modalId);
     localStorage.setItem("visitedIds", JSON.stringify(visitedIds));
   }
+}
+
+function scrollDown(id) {
+  id = "main";
+  $("html,body").animate(
+    {
+      scrollTop: $("#" + id).offset().top,
+    },
+    "slow"
+  );
 }
