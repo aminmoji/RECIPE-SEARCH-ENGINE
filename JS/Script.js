@@ -361,7 +361,7 @@ function criteriaHandler() {
 function storeModalId() {
   console.log("yes!");
   let modalId = $(this).attr("id");
-  console.log(modalId.val());
+  console.log(modalId);
   visitedIds = JSON.parse(localStorage.getItem(visitedIds)) || [];
   if (visitedIds.indexOf(modalId) === -1) {
     visitedIds.push(modalId);
