@@ -201,11 +201,11 @@ function addCards() {
     //Appends the recipes in cards to main element
     $("#main").append(`<div class="card text-center col p-1">
                             <img src="${cardRecipe.image}" class="card-img-top" alt="${cardRecipe.title}" />
-                            <div class="card-body">
+                            <div class="card-body d-flex flex-column">
                               <div class="card-title">
                               ${cardRecipe.title}
                               </div>
-                              <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#${cardRecipe.id}">
+                              <button type="button" class="btn btn-primary mt-auto" data-bs-toggle="modal" data-bs-target="#${cardRecipe.id}">
                                 View Recipe
                               </button>
                             </div>
