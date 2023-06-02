@@ -40,7 +40,7 @@ $(document).ready(function () {
         <a href="#${recipe.id}" data-bs-toggle="modal" data-bs-target="#${
           recipe.id
         }">
-          <img src="${recipe.image}" class="d-block w-100" alt="">
+          <img src="${recipe.image}" class="d-block w-100 carimages" alt="">
         </a>
         <div class="carousel-caption d-none d-md-block">
                     <a href="#${

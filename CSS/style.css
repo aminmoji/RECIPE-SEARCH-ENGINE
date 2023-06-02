@@ -47,3 +47,7 @@ a {
 nav > li > a:hover {
     color: aquamarine;
 }
+
+.carimages {
+    height: 40vh
+}
