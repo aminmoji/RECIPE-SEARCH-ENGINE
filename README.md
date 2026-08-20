@@ -1,33 +1,51 @@
-# RECIPE-SEARCH-ENGINE
+# Recipe Search Engine
 
-**Recipe Search Engine**
-The Recipe Search Engine is a web application that allows users to search for recipes using keywords, multiple ingredients or nutritional value(Calories). The app uses the Recipe - Food - Nutrition API to search for recipes and retrieve recipe information such as ingredients, preparation time, and nutritional information.
+An early boot-camp web project for searching recipes by keyword, ingredients, or nutritional criteria.
 
-**Features**
-A carousel list of 5 random recommended recipes every time the page is refreshed.
-Search for recipes using keywords, ingredients or naturition.
-View recipe information such as ingredients, preparation time, and nutritional information.
-Set the number of desired results
-Visited recipes will be saved for future refrences.
+The application uses the Spoonacular Recipe/Food/Nutrition API through RapidAPI and was built with plain frontend technologies rather than a framework.
 
-**Getting Started**
-To get started with the Recipe Search Engine, simply visit the website and start searching for recipes. There is no need to create an account or log in to use the app.
+## Features
 
-**Technologies Used**
-The Recipe Search Engine was built using the following technologies:
+- Random recipe carousel
+- Search by keyword
+- Search by ingredients
+- Search by nutritional criteria
+- Adjustable number of results
+- Recipe details including ingredients and nutrition
+- Recently viewed recipe tracking
 
-HTML
-CSS
-JavaScript
-jQuery
-Google Fonts
-Recipe - Food - Nutrition API
+## Tech stack
 
-**Screenshots**
+- HTML
+- CSS
+- JavaScript
+- jQuery
+- Bootstrap
+- Google Fonts
+- Spoonacular API via RapidAPI
 
-![image](https://user-images.githubusercontent.com/125992224/227427662-4472bc91-a36c-4a8a-b1fd-3438b0e886c6.png)
-![image](https://user-images.githubusercontent.com/125992224/227427968-49db51cc-d37d-416b-aee9-72d1b8e5b2cf.png)
-![image](https://user-images.githubusercontent.com/125992224/227428052-638027ba-906c-429b-84e8-c8a21370ff81.png)
+## Screenshots
 
-**Start Here!**
+![Recipe Search Engine](https://user-images.githubusercontent.com/125992224/227427662-4472bc91-a36c-4a8a-b1fd-3438b0e886c6.png)
+
+![Recipe Search Engine](https://user-images.githubusercontent.com/125992224/227427968-49db51cc-d37d-416b-aee9-72d1b8e5b2cf.png)
+
+![Recipe Search Engine](https://user-images.githubusercontent.com/125992224/227428052-638027ba-906c-429b-84e8-c8a21370ff81.png)
+
+## Demo
+
+Original GitHub Pages location:
+
 https://aminmoji.github.io/RECIPE-SEARCH-ENGINE/
+
+## API-key note
+
+The repository does **not** contain a RapidAPI key in the current JavaScript source; the key fields are empty.
+
+Because this is a client-side project, putting a private API key directly in the JavaScript would expose it to visitors. To run API-backed searches today, use your own key for local testing or put the API request behind a small backend/serverless proxy.
+
+## Project status
+
+Historical portfolio / learning project.
+
+This repository is useful as an example of early JavaScript, DOM, jQuery, and API work. It is not intended to represent the current structure of a production application.

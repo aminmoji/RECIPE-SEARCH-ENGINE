@@ -2,7 +2,6 @@ let visitedModalRecipes;
 let visitedCardRecipes = [];
 
 $(document).ready(function () {
-  addVisitedCards();
   addVisitedModals();
 });
 
@@ -10,13 +9,20 @@ function getVisitedModalInfo() {
   return new Promise((resolve, reject) => {
     let visitedModalIdsStr = localStorage.getItem("id");
     console.log(visitedModalIdsStr);
+
+    if (!visitedModalIdsStr) {
+      visitedModalRecipes = [];
+      resolve();
+      return;
+    }
+
     $.ajax({
       async: false,
       crossDomain: true,
       url: `https://spoonacular-recipe-food-nutrition-v1.p.rapidapi.com/recipes/informationBulk?ids=${visitedModalIdsStr}`,
       method: "GET",
       headers: {
-        "X-RapidAPI-Key": "57efcb2c17msh4a98997aba86fecp185c0ejsn271ea46ec6ee",
+        "X-RapidAPI-Key": "",
         "X-RapidAPI-Host":
           "spoonacular-recipe-food-nutrition-v1.p.rapidapi.com",
       },
@@ -32,8 +38,7 @@ function getVisitedModalInfo() {
       .catch((e) => {
         console.log(e);
         reject();
-      })
-      .then(() => displayLoading(false));
+      });
   });
 }
 
@@ -59,6 +64,7 @@ function addVisitedCards() {
 
 function addVisitedModals() {
   getVisitedModalInfo().then(() => {
+    addVisitedCards();
     $.each(visitedModalRecipes, function (_, visitedModalRecipe) {
       $("#main").append(`<!-- The Modal -->
                         <div class="modal shadow-lg" id="${visitedModalRecipe.id}">
