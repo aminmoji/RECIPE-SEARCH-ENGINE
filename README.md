@@ -1,51 +1,79 @@
 # Recipe Search Engine
 
-An early boot-camp web project for searching recipes by keyword, ingredients, or nutritional criteria.
+A fast, dependency-free recipe finder that works entirely in the browser. Search by dish name, main ingredient, category, or cuisine; open full instructions; and revisit recipes saved locally on the device.
 
-The application uses the Spoonacular Recipe/Food/Nutrition API through RapidAPI and was built with plain frontend technologies rather than a framework.
+**Live demo:** [aminmoji.github.io/RECIPE-SEARCH-ENGINE](https://aminmoji.github.io/RECIPE-SEARCH-ENGINE/)
 
 ## Features
 
-- Random recipe carousel
-- Search by keyword
-- Search by ingredients
-- Search by nutritional criteria
-- Adjustable number of results
-- Recipe details including ingredients and nutrition
-- Recently viewed recipe tracking
+- Recipe-name search
+- Main-ingredient search
+- Category and cuisine filters
+- Adjustable result count
+- Random recipe discovery
+- Full ingredients, measures, and instructions
+- Original-source and video links when available
+- Recently viewed history stored in the browser
+- Responsive layout and accessible native dialog
+- Loading, empty, error, and offline-service states
 
-## Tech stack
+## Technical approach
 
-- HTML
-- CSS
-- JavaScript
-- jQuery
-- Bootstrap
-- Google Fonts
-- Spoonacular API via RapidAPI
+The project uses semantic HTML, modern CSS, and JavaScript modules without a framework or runtime dependency.
 
-## Screenshots
+```text
+index.html                 Discovery and search page
+recently-viewed.html       Device-local recipe history
+js/app.js                  UI state, safe DOM rendering, and interaction
+js/recipe-api.js           API requests and response normalization
+css/style.css              Responsive visual system
+assets/logo.svg            Repository-native brand mark
+tests/recipe-api.test.js   URL, ingredient, and normalization tests
+```
 
-![Recipe Search Engine](https://user-images.githubusercontent.com/125992224/227427662-4472bc91-a36c-4a8a-b1fd-3438b0e886c6.png)
+Search results are normalized into one small application model before the UI receives them. Recipe text is added with DOM APIs and `textContent` rather than injected as HTML.
 
-![Recipe Search Engine](https://user-images.githubusercontent.com/125992224/227427968-49db51cc-d37d-416b-aee9-72d1b8e5b2cf.png)
+## Recipe data
 
-![Recipe Search Engine](https://user-images.githubusercontent.com/125992224/227428052-638027ba-906c-429b-84e8-c8a21370ff81.png)
+Data and images come from [TheMealDB](https://www.themealdb.com/api.php). Its V1 educational endpoint uses the documented test key `1` in the URL, so this static GitHub Pages project does not expose a private credential.
 
-## Demo
+The public API supports one main ingredient per filter request. Multi-ingredient filtering is therefore deliberately not presented as a feature.
 
-Original GitHub Pages location:
+## Run locally
 
-https://aminmoji.github.io/RECIPE-SEARCH-ENGINE/
+JavaScript modules require an HTTP server rather than opening the HTML file directly:
 
-## API-key note
+```bash
+git clone https://github.com/aminmoji/RECIPE-SEARCH-ENGINE.git
+cd RECIPE-SEARCH-ENGINE
+python3 -m http.server 8080
+```
 
-The repository does **not** contain a RapidAPI key in the current JavaScript source; the key fields are empty.
+Open `http://localhost:8080`.
 
-Because this is a client-side project, putting a private API key directly in the JavaScript would expose it to visitors. To run API-backed searches today, use your own key for local testing or put the API request behind a small backend/serverless proxy.
+## Verify
 
-## Project status
+Node.js 20 or newer is used only for development checks:
 
-Historical portfolio / learning project.
+```bash
+npm ci
+npm run check
+npm test
+```
 
-This repository is useful as an example of early JavaScript, DOM, jQuery, and API work. It is not intended to represent the current structure of a production application.
+The deployed application itself has no npm dependencies and no build step.
+
+## Privacy and security
+
+- No account, password, analytics, or private API key
+- Recently viewed recipes remain in `localStorage` on the current device
+- External recipe text is rendered as text, not HTML
+- External links are restricted to HTTP and HTTPS and open with `noopener`
+- A Content Security Policy limits scripts, network requests, and images
+- Stale searches are cancelled before a new request begins
+
+## Project background
+
+This project began as a 2023 boot-camp API exercise and was later rebuilt as a working static portfolio application with no credential setup required.
+
+Recipe data and images are provided by TheMealDB. Application code is available under the [MIT License](LICENSE).

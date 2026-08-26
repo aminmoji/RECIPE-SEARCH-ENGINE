@@ -1,0 +1,16 @@
+{
+  "name": "recipe-search-engine",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "A dependency-free recipe search application powered by TheMealDB",
+  "scripts": {
+    "check": "node --check js/app.js && node --check js/recipe-api.js",
+    "test": "node --test"
+  },
+  "author": "Amin Mojaddam",
+  "license": "MIT",
+  "engines": {
+    "node": ">=20"
+  }
+}
