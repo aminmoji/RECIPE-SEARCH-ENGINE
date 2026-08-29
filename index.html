@@ -3,11 +3,11 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="description" content="Find practical recipes by name, ingredient, category, or cuisine.">
-    <meta name="theme-color" content="#f7efe3">
+    <meta name="description" content="Find practical recipes by dish, ingredient, category, or cuisine.">
+    <meta name="theme-color" content="#143d35">
     <meta name="referrer" content="strict-origin-when-cross-origin">
     <meta http-equiv="Content-Security-Policy" content="default-src 'self'; connect-src 'self' https://www.themealdb.com; img-src 'self' https://www.themealdb.com data:; style-src 'self'; script-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; upgrade-insecure-requests">
-    <title>Recipe Search — Find something worth cooking</title>
+    <title>Recipe Search — Turn an idea into dinner</title>
     <link rel="icon" href="./assets/logo.svg" type="image/svg+xml">
     <link rel="stylesheet" href="./css/style.css">
   </head>
@@ -16,9 +16,13 @@
 
     <header class="site-header">
       <a class="brand" href="./index.html" aria-label="Recipe Search home">
-        <img src="./assets/logo.svg" alt="" width="48" height="48">
-        <span>Recipe Search</span>
+        <img src="./assets/logo.svg" alt="" width="44" height="44">
+        <span class="brand__text">
+          <strong>Recipe Search</strong>
+          <small>Cook something good</small>
+        </span>
       </a>
+
       <nav aria-label="Primary navigation">
         <a aria-current="page" href="./index.html">Discover</a>
         <a href="./recently-viewed.html">Recently viewed</a>
@@ -26,66 +30,119 @@
     </header>
 
     <main id="main-content">
-      <section class="hero">
-        <div class="hero__intro">
-          <p class="eyebrow">Cook with what you have</p>
-          <h1>Find something worth cooking.</h1>
-          <p class="hero__copy">Search a public recipe collection by dish, main ingredient, category, or cuisine. No account or API key required.</p>
-          <button class="button button--secondary" type="button" id="surprise">Surprise me</button>
+      <section class="hero" aria-labelledby="hero-title">
+        <div class="hero__glow hero__glow--one" aria-hidden="true"></div>
+        <div class="hero__glow hero__glow--two" aria-hidden="true"></div>
+
+        <div class="hero__content">
+          <p class="eyebrow eyebrow--light">Your next meal starts here</p>
+          <h1 id="hero-title">Turn an idea into dinner.</h1>
+          <p class="hero__copy">Search thousands of recipes by name, ingredient, category, or cuisine. No account, no clutter—just something good to cook.</p>
+
+          <form class="search-panel" id="recipe-search" role="search">
+            <div class="search-panel__mode">
+              <label for="mode">Search by</label>
+              <select id="mode" name="mode">
+                <option value="name">Recipe name</option>
+                <option value="ingredient">Main ingredient</option>
+                <option value="category">Category</option>
+                <option value="area">Cuisine</option>
+              </select>
+            </div>
+
+            <div class="search-panel__query">
+              <label class="sr-only" for="query">What would you like to cook?</label>
+              <span class="search-panel__icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" width="22" height="22">
+                  <circle cx="11" cy="11" r="6.75"></circle>
+                  <path d="m16 16 4 4"></path>
+                </svg>
+              </span>
+              <input id="query" name="query" type="search" maxlength="80" autocomplete="off" placeholder="Try “salmon”, “pasta” or “Thai”" required>
+            </div>
+
+            <button class="button button--accent search-panel__submit" type="submit">
+              <span>Search recipes</span>
+              <svg aria-hidden="true" viewBox="0 0 24 24" width="18" height="18">
+                <path d="M5 12h14M14 7l5 5-5 5"></path>
+              </svg>
+            </button>
+
+            <div class="search-panel__options">
+              <span>Popular:</span>
+              <button class="quick-search" type="button" data-mode="name" data-query="pasta">Pasta</button>
+              <button class="quick-search" type="button" data-mode="ingredient" data-query="chicken">Chicken</button>
+              <button class="quick-search" type="button" data-mode="category" data-query="vegetarian">Vegetarian</button>
+              <button class="quick-search" type="button" data-mode="area" data-query="Italian">Italian</button>
+            </div>
+          </form>
+
+          <button class="surprise-button" type="button" id="surprise">
+            <svg aria-hidden="true" viewBox="0 0 24 24" width="18" height="18">
+              <path d="M16 3h5v5M4 20 21 3M21 16v5h-5M15 15l6 6M4 4l5 5"></path>
+            </svg>
+            Surprise me with something new
+          </button>
         </div>
 
-        <form class="search-panel" id="recipe-search" role="search">
-          <label>
-            Search by
-            <select id="mode" name="mode">
-              <option value="name">Recipe name</option>
-              <option value="ingredient">Main ingredient</option>
-              <option value="category">Category</option>
-              <option value="area">Cuisine</option>
-            </select>
-          </label>
-          <label class="search-panel__query">
-            What are you looking for?
-            <input id="query" name="query" type="search" maxlength="80" autocomplete="off" required>
-          </label>
-          <label>
-            Results
-            <select id="limit" name="limit">
-              <option value="6">6</option>
-              <option value="12" selected>12</option>
-              <option value="20">20</option>
-            </select>
-          </label>
-          <button class="button" type="submit">Find recipes</button>
-        </form>
+        <aside class="hero-note" aria-label="Service highlights">
+          <span class="hero-note__icon" aria-hidden="true">✓</span>
+          <p><strong>Free and private.</strong> No sign-up, tracking, or private API key.</p>
+        </aside>
       </section>
 
       <section class="featured-section" aria-labelledby="featured-heading">
-        <div class="section-heading">
-          <p class="eyebrow">Daily inspiration</p>
-          <h2 id="featured-heading">Start somewhere delicious</h2>
+        <div class="section-heading section-heading--split">
+          <div>
+            <p class="eyebrow">Chef's pick</p>
+            <h2 id="featured-heading">A little inspiration</h2>
+          </div>
+          <p>Not sure where to start? Explore a randomly selected dish from the collection.</p>
         </div>
-        <div class="featured skeleton" id="featured" aria-live="polite">Choosing a featured recipe…</div>
+        <div class="featured skeleton" id="featured" aria-live="polite">
+          <span class="loading-spinner" aria-hidden="true"></span>
+          <span>Choosing today's recipe…</span>
+        </div>
       </section>
 
       <section class="results-section" aria-labelledby="results-heading">
-        <div class="section-heading">
-          <p class="eyebrow">Recipe collection</p>
-          <h2 id="results-heading">Search results</h2>
+        <div class="results-toolbar">
+          <div>
+            <p class="eyebrow">Explore the collection</p>
+            <h2 id="results-heading">Popular recipes</h2>
+          </div>
+
+          <label class="result-limit" for="limit">
+            <span>Show</span>
+            <select id="limit" name="limit" form="recipe-search">
+              <option value="6" selected>6 recipes</option>
+              <option value="12">12 recipes</option>
+              <option value="20">20 recipes</option>
+            </select>
+          </label>
         </div>
-        <p class="status" id="status" aria-live="polite">Use the search above to explore the collection.</p>
-        <div class="recipe-grid" id="results"></div>
+
+        <p class="status" id="status" aria-live="polite">Loading a few ideas to get you started…</p>
+        <div class="recipe-grid" id="results" aria-live="polite"></div>
       </section>
     </main>
 
-    <dialog id="recipe-dialog" aria-label="Recipe details">
-      <button class="dialog-close" type="button" id="dialog-close" aria-label="Close recipe">×</button>
+    <dialog id="recipe-dialog" aria-labelledby="dialog-title">
+      <button class="dialog-close" type="button" id="dialog-close" aria-label="Close recipe">
+        <svg aria-hidden="true" viewBox="0 0 24 24" width="22" height="22">
+          <path d="m6 6 12 12M18 6 6 18"></path>
+        </svg>
+      </button>
       <div id="dialog-content"></div>
     </dialog>
 
     <footer>
+      <a class="brand brand--footer" href="./index.html" aria-label="Recipe Search home">
+        <img src="./assets/logo.svg" alt="" width="38" height="38">
+        <strong>Recipe Search</strong>
+      </a>
       <p>Recipe data and images provided by <a href="https://www.themealdb.com/" target="_blank" rel="noopener noreferrer">TheMealDB</a>.</p>
-      <p>Built by <a href="https://github.com/aminmoji">Amin Mojaddam</a>.</p>
+      <p>Designed and built by <a href="https://github.com/aminmoji">Amin Mojaddam</a>.</p>
     </footer>
 
     <noscript>This application requires JavaScript to search and display recipes.</noscript>

@@ -19,6 +19,7 @@ const elements = {
   status: document.querySelector("#status"),
   surprise: document.querySelector("#surprise"),
   featured: document.querySelector("#featured"),
+  quickSearches: document.querySelectorAll(".quick-search"),
   dialog: document.querySelector("#recipe-dialog"),
   dialogContent: document.querySelector("#dialog-content"),
   dialogClose: document.querySelector("#dialog-close"),
@@ -26,6 +27,8 @@ const elements = {
 
 let activeSearch;
 let activeDetail;
+let lastResults = [];
+let lastHeading = "";
 
 function getHistory() {
   try {
@@ -60,52 +63,122 @@ function setStatus(message, type = "") {
 }
 
 function createMeta(meal) {
-  const meta = document.createElement("p");
+  const meta = document.createElement("div");
   const values = [meal.category, meal.area].filter(Boolean);
   meta.className = "recipe-meta";
-  meta.textContent = values.length ? values.join(" · ") : "Recipe";
+
+  (values.length ? values : ["Recipe"]).forEach((value) => {
+    const item = document.createElement("span");
+    item.textContent = value;
+    meta.append(item);
+  });
+
   return meta;
 }
 
 function createRecipeCard(meal) {
   const article = document.createElement("article");
+  const visual = document.createElement("div");
   const image = document.createElement("img");
   const content = document.createElement("div");
   const title = document.createElement("h3");
   const button = document.createElement("button");
 
   article.className = "recipe-card";
+  visual.className = "recipe-card__visual";
   image.src = meal.image;
-  image.alt = "";
+  image.alt = `${meal.title} recipe`;
   image.loading = "lazy";
+  image.decoding = "async";
   image.width = 640;
   image.height = 480;
+  image.addEventListener("error", () => image.remove());
   content.className = "recipe-card__content";
   title.textContent = meal.title;
   button.type = "button";
-  button.className = "button button--small";
+  button.className = "recipe-card__link";
   button.textContent = "View recipe";
+  button.setAttribute("aria-label", `View recipe: ${meal.title}`);
   button.addEventListener("click", () => openMeal(meal.id));
 
+  visual.append(image);
   content.append(createMeta(meal), title, button);
-  article.append(image, content);
+  article.append(visual, content);
   return article;
 }
 
-function renderResults(meals, heading) {
+function renderLoadingCards(count = 6) {
+  elements.results.replaceChildren();
+  const fragment = document.createDocumentFragment();
+
+  Array.from({ length: count }, () => {
+    const card = document.createElement("article");
+    const line = document.createElement("span");
+    card.className = "recipe-card loading-grid-card";
+    card.setAttribute("aria-hidden", "true");
+    card.append(line);
+    return card;
+  }).forEach((card) => fragment.append(card));
+
+  elements.results.append(fragment);
+}
+
+function renderEmptyState(title, copy, includeLink = false) {
+  const empty = document.createElement("div");
+  const icon = document.createElement("span");
+  const heading = document.createElement("h3");
+  const message = document.createElement("p");
+
+  empty.className = "empty-state";
+  icon.className = "empty-state__icon";
+  icon.setAttribute("aria-hidden", "true");
+  icon.textContent = "⌕";
+  heading.textContent = title;
+  message.textContent = copy;
+  empty.append(icon, heading, message);
+
+  if (includeLink) {
+    const link = document.createElement("a");
+    link.className = "button button--accent";
+    link.href = "./index.html";
+    link.textContent = "Discover recipes";
+    empty.append(link);
+  }
+
+  elements.results.replaceChildren(empty);
+}
+
+function renderResults(meals, heading, { scroll = true, statusMessage = "", cache = true } = {}) {
+  if (cache) {
+    lastResults = meals;
+    lastHeading = heading;
+  }
+
   elements.results.replaceChildren();
   elements.resultsHeading.textContent = heading;
 
   if (!meals.length) {
     setStatus("No recipes matched that search. Try a broader term.", "empty");
+    renderEmptyState(
+      "Nothing on the menu yet",
+      "Try a shorter recipe name, a common ingredient, or one of the popular searches above."
+    );
     return;
   }
 
+  const limit = Number(elements.limit?.value) || meals.length;
+  const visibleMeals = meals.slice(0, limit);
   const fragment = document.createDocumentFragment();
-  meals.forEach((meal) => fragment.append(createRecipeCard(meal)));
+  visibleMeals.forEach((meal) => fragment.append(createRecipeCard(meal)));
   elements.results.append(fragment);
-  setStatus(`${meals.length} recipe${meals.length === 1 ? "" : "s"} found.`, "success");
-  elements.resultsHeading.scrollIntoView({ behavior: "smooth", block: "start" });
+  setStatus(
+    statusMessage || `${visibleMeals.length} recipe${visibleMeals.length === 1 ? "" : "s"} found.`,
+    "success"
+  );
+
+  if (scroll) {
+    elements.resultsHeading.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
 }
 
 function safeExternalLink(value) {
@@ -131,7 +204,7 @@ function renderMealDetails(meal) {
 
   layout.className = "recipe-detail";
   image.src = meal.image;
-  image.alt = "";
+  image.alt = `${meal.title} recipe`;
   image.width = 720;
   image.height = 540;
   body.className = "recipe-detail__body";
@@ -192,7 +265,16 @@ function renderMealDetails(meal) {
 async function openMeal(id) {
   activeDetail?.abort();
   activeDetail = new AbortController();
-  elements.dialogContent.textContent = "Loading recipe…";
+  const loading = document.createElement("div");
+  const spinner = document.createElement("span");
+  const message = document.createElement("span");
+  loading.className = "dialog-state";
+  spinner.className = "loading-spinner";
+  spinner.setAttribute("aria-hidden", "true");
+  message.id = "dialog-title";
+  message.textContent = "Preparing the recipe…";
+  loading.append(spinner, message);
+  elements.dialogContent.replaceChildren(loading);
   if (!elements.dialog.open) {
     elements.dialog.showModal();
   }
@@ -208,7 +290,11 @@ async function openMeal(id) {
     if (error.name === "AbortError") {
       return;
     }
-    elements.dialogContent.textContent = "This recipe is temporarily unavailable. Please try again.";
+    const unavailable = document.createElement("div");
+    unavailable.className = "dialog-state";
+    unavailable.id = "dialog-title";
+    unavailable.textContent = "This recipe is temporarily unavailable. Please try again.";
+    elements.dialogContent.replaceChildren(unavailable);
   }
 }
 
@@ -224,7 +310,7 @@ function renderFeatured(meal) {
   const button = document.createElement("button");
 
   image.src = meal.image;
-  image.alt = "";
+  image.alt = `${meal.title} recipe`;
   image.width = 960;
   image.height = 720;
   content.className = "featured__content";
@@ -264,24 +350,33 @@ async function handleSearch(event) {
   }
 
   activeSearch?.abort();
-  activeSearch = new AbortController();
+  const searchController = new AbortController();
+  activeSearch = searchController;
+  lastResults = [];
+  lastHeading = "";
   setStatus("Searching recipes…", "loading");
+  renderLoadingCards(Math.min(Number(elements.limit.value) || 6, 6));
   elements.searchForm.setAttribute("aria-busy", "true");
 
   try {
     const meals = await searchMeals({
       mode: elements.mode.value,
       query,
-      signal: activeSearch.signal,
+      signal: searchController.signal,
     });
-    const limit = Number(elements.limit.value) || 12;
-    renderResults(meals.slice(0, limit), `Results for “${query}”`);
+    renderResults(meals, `Results for “${query}”`);
   } catch (error) {
     if (error.name !== "AbortError") {
       setStatus("The recipe service could not complete this search. Try again shortly.", "error");
+      renderEmptyState(
+        "The kitchen is taking a moment",
+        "The recipe service could not complete that search. Please try again shortly."
+      );
     }
   } finally {
-    elements.searchForm.removeAttribute("aria-busy");
+    if (activeSearch === searchController) {
+      elements.searchForm.removeAttribute("aria-busy");
+    }
   }
 }
 
@@ -301,7 +396,12 @@ function renderHistory() {
   elements.results.replaceChildren();
 
   if (!history.length) {
-    setStatus("Recipes you open will appear here on this device.", "empty");
+    setStatus("No recipes saved yet.", "empty");
+    renderEmptyState(
+      "Your shortlist is empty",
+      "Open any recipe and it will be saved here automatically on this device.",
+      true
+    );
     return;
   }
 
@@ -309,6 +409,24 @@ function renderHistory() {
   history.forEach((meal) => fragment.append(createRecipeCard(meal)));
   elements.results.append(fragment);
   setStatus(`${history.length} saved recipe${history.length === 1 ? "" : "s"}.`, "success");
+}
+
+async function loadInitialRecipes() {
+  renderLoadingCards(6);
+
+  try {
+    const meals = await searchMeals({ mode: "category", query: "Vegetarian" });
+    renderResults(meals, "Dinner inspiration", {
+      scroll: false,
+      statusMessage: "A few dependable ideas to get you started.",
+    });
+  } catch {
+    setStatus("Starter recipes are temporarily unavailable. Search for something you love.", "error");
+    renderEmptyState(
+      "What are you hungry for?",
+      "Use the search above to find a recipe by name, ingredient, category, or cuisine."
+    );
+  }
 }
 
 elements.dialogClose?.addEventListener("click", () => elements.dialog.close());
@@ -322,6 +440,19 @@ elements.dialog?.addEventListener("click", (event) => {
 if (elements.page === "home") {
   elements.searchForm.addEventListener("submit", handleSearch);
   elements.mode.addEventListener("change", updateSearchHint);
+  elements.limit.addEventListener("change", () => {
+    if (lastResults.length) {
+      renderResults(lastResults, lastHeading, { scroll: false, cache: false });
+    }
+  });
+  elements.quickSearches.forEach((button) => {
+    button.addEventListener("click", () => {
+      elements.mode.value = button.dataset.mode;
+      elements.query.value = button.dataset.query;
+      updateSearchHint();
+      elements.searchForm.requestSubmit();
+    });
+  });
   elements.surprise.addEventListener("click", async () => {
     setStatus("Choosing a recipe…", "loading");
     try {
@@ -336,6 +467,7 @@ if (elements.page === "home") {
   });
   updateSearchHint();
   loadFeatured();
+  loadInitialRecipes();
 } else if (elements.page === "recent") {
   renderHistory();
 }
